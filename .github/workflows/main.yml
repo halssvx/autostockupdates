@@ -1,0 +1,33 @@
+name: Update Stock Data
+
+on:
+  schedule:
+    - cron: "0 8 * * *"   # runs every day at 8 AM UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run update script
+        run: python update_data.py
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name "halssvx"
+          git config user.email "farahhaala01@gmail.com"
+          git add data/*.csv
+          git commit -m "Auto-update stock data" || echo "No changes"
+          git push
